@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Result Notifier</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f9fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 20px 30px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+      width: 350px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    label {
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin: 8px 0 15px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .message {
+      text-align: center;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    .success {
+      color: green;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Enter Student Details</h2>
+    <form id="resultForm">
+      <label>Name:</label>
+      <input type="text" name="name" required />
+
+      <label>Email:</label>
+      <input type="email" name="email" required />
+
+      <label>Phone:</label>
+      <input type="text" name="phone" required />
+
+      <label>Marks:</label>
+      <input type="number" name="marks" required />
+
+      <button type="submit">Submit</button>
+    </form>
+    <div id="responseMessage" class="message"></div>
+  </div>
+
+  <script>
+    document.getElementById("resultForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const form = e.target;
+      const data = {
+        name: form.name.value,
+        email: form.email.value,
+        phone: form.phone.value,
+        marks: form.marks.value
+      };
+
+      try {
+        const res = await fetch("/api/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+        const msgDiv = document.getElementById("responseMessage");
+
+        if (res.ok) {
+          msgDiv.textContent = "✅ " + result.message;
+          msgDiv.className = "message success";
+          form.reset();
+        } else {
+          msgDiv.textContent = "❌ Error: " + result.error;
+          msgDiv.className = "message error";
+        }
+      } catch (err) {
+        document.getElementById("responseMessage").textContent = "⚠️ Server not responding!";
+        document.getElementById("responseMessage").className = "message error";
+      }
+    });
+  </script>
+</body>
+</html>
